@@ -1,5 +1,6 @@
 from PIL import Image
 import re
+img_length=50
 def compress(path):
 	with open(path,'rb') as f:
 		src=f.read()
@@ -15,13 +16,13 @@ def com(path):
 		src=f.read()
 	return ''.join(bin(byte)[2:].zfill(8) for byte in src)
 
-def uncompress(code,path):
+def uncom(code,path):
 	print('-------')
 	b = bytearray([int(code[x:x+8], 2) for x in range(0, len(code), 8)])
 	with open(path,'wb') as f:
 		f.write(b)
-def to_image(code):
-	img=Image.new('1',(20,20))
+def to_image(code,path):
+	img=Image.new('1',(img_length,img_length))
 	pixels=img.load()
 	length=len(code)
 	c=0
@@ -36,7 +37,14 @@ def to_image(code):
 				if flag:
 					pixels[row,line]=0
 					flag=0
-	img.save('text.bmp')
+	img.save(path)
+def to_images(code,path):
+	count=1
+	for item in range(0,len(code),img_length*img_length):
+		print(item)
+		t=code[item:item+img_length*img_length]
+		to_image(t,path+'/'+str(count)+'.bmp')
+		count+=1
 def from_image(path):
 	img=Image.open(path)
 	pixels=img.load()
@@ -50,8 +58,9 @@ def from_image(path):
 	match=re.search(r'01+$',result)
 	return result[:match.start()]
 if __name__=='__main__':
-	path='text'
+	path='file/text'
 	#uncompress(com(path),'text1')
-	print(com(path))
-	to_image(com(path))
-	print(from_image('text.bmp'))
+	#print(com(path))
+	#to_image(com(path),'result/text.bmp')
+	to_images(com(path),'result/images')
+	#uncom(from_image('result/text.bmp'),'result/text')
