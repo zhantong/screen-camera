@@ -24,7 +24,7 @@ def uncom(code,path):
 	with open(path,'wb') as f:
 		f.write(b)
 def to_image(code,path):
-	img=Image.new('1',(img_length,img_length))
+	img=Image.new('1',(img_length+4*width,img_length+4*width))
 	pixels=img.load()
 	length=len(code)
 	c=0
@@ -45,17 +45,17 @@ def to_image(code,path):
 						for j in range(width):
 							pixels[row+i,line+j]=0
 					flag=0
-	add_frame(pixels)
+	add_frame(pixels,img.size[0])
 	img.save(path)
 
-def add_frame(pixels):
-	for p in range(0,img_length,width):
+def add_frame(pixels,length):
+	for p in range(0,length,width):
 		for i in range(width):
 			for j in range(width):
 				pixels[p+i,j]=1
-				pixels[p+i,img_length-1-j]=1
+				pixels[p+i,length-1-j]=1
 				pixels[i,p+j]=1
-				pixels[img_length-1-i,p+j]=1
+				pixels[length-1-i,p+j]=1
 				if not (p/width)%2:
 					pixels[p+i,j+width]=1
 def to_images(code,path):
@@ -68,8 +68,8 @@ def from_image(path):
 	img=Image.open(path)
 	pixels=img.load()
 	result=''
-	for line in range(0,img.size[1],width):
-		for row in range(0,img.size[0],width):
+	for line in range(2*width,img.size[1]-2*width,width):
+		for row in range(2*width,img.size[0]-2*width,width):
 			if pixels[row,line]==0:
 				result+='0'
 			else:
@@ -83,11 +83,11 @@ def from_images(path):
 	match=re.search(r'01*$',result)
 	return result[:match.start()]
 if __name__=='__main__':
-	path='file/Hello World.docx'
+	path='file/com073-buiA.docx'
 	#uncompress(com(path),'text1')
 	#print(com(path))
 	#to_image(com(path),'result/text.bmp')
 	to_images(com(path),'result/images')
 	#uncom(from_image('result/text.bmp'),'result/text')
-	#uncom(from_images('result/images'),'result/text')
+	uncom(from_images('result/images'),'result/text')
 	#print(from_images('result/images'))
