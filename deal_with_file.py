@@ -29,8 +29,8 @@ def to_image(code,path):
 	length=len(code)
 	c=0
 	flag=1
-	for line in range(0,img.size[1],width):
-		for row in range(0,img.size[0],width):
+	for line in range(2*width,img.size[1]-2*width,width):
+		for row in range(2*width,img.size[0]-2*width,width):
 			if c<length:
 				for i in range(width):
 					for j in range(width):
@@ -45,7 +45,19 @@ def to_image(code,path):
 						for j in range(width):
 							pixels[row+i,line+j]=0
 					flag=0
+	add_frame(pixels)
 	img.save(path)
+
+def add_frame(pixels):
+	for p in range(0,img_length,width):
+		for i in range(width):
+			for j in range(width):
+				pixels[p+i,j]=1
+				pixels[p+i,img_length-1-j]=1
+				pixels[i,p+j]=1
+				pixels[img_length-1-i,p+j]=1
+				if not (p/width)%2:
+					pixels[p+i,j+width]=1
 def to_images(code,path):
 	count=1
 	for item in range(0,len(code),(img_length//width)*(img_length//width)):
@@ -77,5 +89,5 @@ if __name__=='__main__':
 	#to_image(com(path),'result/text.bmp')
 	to_images(com(path),'result/images')
 	#uncom(from_image('result/text.bmp'),'result/text')
-	uncom(from_images('result/images'),'result/text')
+	#uncom(from_images('result/images'),'result/text')
 	#print(from_images('result/images'))
