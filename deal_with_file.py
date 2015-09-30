@@ -1,5 +1,6 @@
 from PIL import Image
 import re
+import os
 img_length=50
 def compress(path):
 	with open(path,'rb') as f:
@@ -41,9 +42,8 @@ def to_image(code,path):
 def to_images(code,path):
 	count=1
 	for item in range(0,len(code),img_length*img_length):
-		print(item)
 		t=code[item:item+img_length*img_length]
-		to_image(t,path+'/'+str(count)+'.bmp')
+		to_image(t,path+'/'+str(count).zfill(5)+'.bmp')
 		count+=1
 def from_image(path):
 	img=Image.open(path)
@@ -55,12 +55,19 @@ def from_image(path):
 				result+='0'
 			else:
 				result+='1'
+	return result
+def from_images(path):
+	result=''
+	for file_name in os.listdir(path):
+		print('dealing with %s'%file_name)
+		result+=from_image(path+'/'+file_name)
 	match=re.search(r'01+$',result)
 	return result[:match.start()]
 if __name__=='__main__':
-	path='file/text'
+	path='file/com073-buiA.docx'
 	#uncompress(com(path),'text1')
 	#print(com(path))
 	#to_image(com(path),'result/text.bmp')
 	to_images(com(path),'result/images')
 	#uncom(from_image('result/text.bmp'),'result/text')
+	uncom(from_images('result/images'),'result/text')
