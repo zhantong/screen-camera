@@ -1,8 +1,8 @@
 from PIL import Image
 import re
 import os
-img_length=100
-width=2
+img_length=200
+width=4
 def compress(path):
 	with open(path,'rb') as f:
 		src=f.read()
@@ -56,8 +56,8 @@ def add_frame(pixels,length):
 				pixels[p+i,length-1-j]=1
 				pixels[i,p+j]=1
 				pixels[length-1-i,p+j]=1
-				if not (p/width)%2:
-					pixels[p+i,j+width]=1
+#				if not (p/width)%2:
+#					pixels[p+i,j+width]=1
 def to_images(code,path):
 	count=1
 	for item in range(0,len(code),(img_length//width)*(img_length//width)):
@@ -83,11 +83,12 @@ def from_images(path):
 	match=re.search(r'01*$',result)
 	return result[:match.start()]
 if __name__=='__main__':
-	path='file/com073-buiA.docx'
+	path='file/text1'
 	#uncompress(com(path),'text1')
 	#print(com(path))
-	#to_image(com(path),'result/text.bmp')
-	to_images(com(path),'result/images')
+	to_image(com(path),'result/text.bmp')
+	#to_images(com(path),'result/images')
 	#uncom(from_image('result/text.bmp'),'result/text')
-	uncom(from_images('result/images'),'result/text')
-	#print(from_images('result/images'))
+	#uncom(from_images('result/images'),'result/text')
+	#res=from_image('result/images/00003.bmp')
+	#print(res,len(res))

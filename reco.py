@@ -19,66 +19,138 @@ def rotate(img,pixels):
 	while not (pixels[row,line][0]==0 and pixels[row-1,line][0]==255):
 		row+=1
 	row_orig,line_orig=row,line
-	row_final,line_final=0,0
+	row_lt,line_lt=0,0
 	flag=0
+#	while 1:
+#		flag_1=0
+#		line-=1
+#		if not pixels[row,line][0]:
+#			while not pixels[row,line][0]:
+#				row-=1
+#			row+=1
+#		else:
+#			row_final=row
+#			count=0
+#			t=row
+#			while pixels[row,line][0]:
+#				count+=1
+#				row-=1
+#				if count>COUNT_WHITE:
+#					count_1=0
+#					row=t
+#					while pixels[row,line][0]:
+#						count_1+=1
+#						row+=1
+#						print(row,line,pixels[row,line])
+#						if count_1>COUNT_WHITE:
+#							line_final=line-1
+#							flag=1
+#							flag_1=1
+#							break
+#				if flag_1:
+#					break
+#		if flag:
+#			break
 	while 1:
-		flag_1=0
 		line-=1
-		if not pixels[row,line][0]:
-			while not pixels[row,line][0]:
-				row-=1
-			row+=1
-		else:
-			row_final=row
-			count=0
-			t=row
-			while pixels[row,line][0]:
-				count+=1
-				row-=1
-				if count>COUNT_WHITE:
-					count_1=0
-					row=t
-					while pixels[row,line][0]:
-						count_1+=1
-						row+=1
-						#print(row,line,pixels[row,line])
-						if count_1>COUNT_WHITE:
-							line_final=line-1
-							flag=1
-							flag_1=1
-							break
-				if flag_1:
-					break
-		if flag:
-			break
-	row_d,line_d=0,0
-	flag=0
-	row,line=row_orig,line_orig
-	while 1:
-		flag_1=0
-		line+=1
 		if pixels[row,line][0]:
 			count=0
-			row_d=row
+			row_lt=row
 			while pixels[row,line][0]:
 				count+=1
 				row+=1
 				if count>COUNT_WHITE:
-					line_d=line-1
+					line_lt=line+1
 					flag=1
 					break
-		if flag:
-			break
+			if flag:
+				break
 		else:
 			while not pixels[row,line][0]:
 				row-=1
 			row+=1
-	#print('d:',row_d,line_d)
-
-	digree=math.atan((row_d-row_final)/(line_d-line_final))*180/math.pi
-	print(row_final,line_final,row_d,line_d,digree)
-	img=img.rotate(-digree)
-	return img
+	print('lt:',row_lt,line_lt)
+	row_lb,line_lb=0,0
+	flag=0
+	row,line=row_orig,line_orig
+	while 1:
+		line+=1
+		if pixels[row,line][0]:
+			count=0
+			row_lb=row
+			while pixels[row,line][0]:
+				count+=1
+				row+=1
+				if count>COUNT_WHITE:
+					line_lb=line-1
+					flag=1
+					break
+			if flag:
+				break
+		else:
+			while not pixels[row,line][0]:
+				row-=1
+			row+=1
+	print('lb:',row_lb,line_lb)
+	line=img.size[1]//2
+	row=img.size[0]-2
+	while not (pixels[row,line][0]==0 and pixels[row+1,line][0]==255):
+		row-=1
+	row_orig,line_orig=row,line
+	#print(row_orig,line_orig)
+	row_rt,line_rt=0,0
+	flag=0
+	while 1:
+		line-=1
+		if pixels[row,line][0]:
+			count=0
+			row_rt=row
+			while pixels[row,line][0]:
+				count+=1
+				row-=1
+				if count>COUNT_WHITE:
+					line_rt=line+1
+					flag=1
+					break
+			if flag:
+				break
+		else:
+			while not pixels[row,line][0]:
+				row+=1
+			row-=1
+	print('rt:',row_rt,line_rt)
+	row,line=row_orig,line_orig
+	row_rb,line_rb=0,0
+	flag=0
+	while 1:
+		line+=1
+		if pixels[row,line][0]:
+			count=0
+			row_rb=row
+			while pixels[row,line][0]:
+				count+=1
+				row-=1
+				if count>COUNT_WHITE:
+					line_rb=line-1
+					flag=1
+					break
+			if flag:
+				break
+		else:
+			while not pixels[row,line][0]:
+				row+=1
+			row-=1
+	print('rb:',row_rb,line_rb)
+	#digree=math.atan((row_d-row_final)/(line_d-line_final))*180/math.pi
+	#print(row_final,line_final,row_d,line_d,digree)
+	#img=img.rotate(-digree)
+	#return img
+	return{
+	'lt':{'row':row_lt,'line':line_lt},
+	'lb':{'row':row_lb,'line':line_lb},
+	'rt':{'row':row_rt,'line':line_rt},
+	'rb':{'row':row_rb,'line':line_rb},
+	}
 
 def get_border(img,pixels):
 	row=0
@@ -169,6 +241,31 @@ def get_border(img,pixels):
 	'line_end':line_end
 	}
 
+def test(img,pixels):
+	def cal(row,line):
+		return ((a*row+b*line+d)/(m*row+n*line+1),(e*row+f*line+h)/(m*row+n*line+1))
+	x=208
+	org=rotate(img,pixels)
+	x1=org['lt']['row']
+	y1=org['lt']['line']
+	x2=org['lb']['row']
+	y2=org['lb']['line']
+	x3=org['rb']['row']
+	y3=org['rb']['line']
+	x4=org['rt']['row']
+	y4=org['rt']['line']
+	b=(x2-x1)/x
+	d=x1
+	h=y1
+	e=(y4-y1)/x
+	m=((x1-x2+x3-x4)*(y2-y3)+(-y1+y2-y3+y4)*(y4-y3))/(x*((x4-x3)*(y2-y3)-(x2-x3)*(y4-y3)))
+	n=(x1-x2+x3-x4-m*x*(x4-x3))/(x*(y4-y3))
+	a=(x4+m*x*x4+n*x*y4-d)/x
+	f=(y2+m*x*x2+n*x*y2-h)/x
+	#print(a,b,d,e,f,h,m,n)
+	print(cal(18,14))
+
+ 
 def reco(img,pixels):
 	b=get_border(img,pixels)
 	#line_start=max(item['line_start'] for item in b)
@@ -215,14 +312,16 @@ def reco(img,pixels):
 if __name__=='__main__':
 	start_time=time.time()
 	#img=Image.open('test/007.png')
-	img=Image.open('img1.jpg')
+	img=Image.open('f.jpg')
 	img=img.rotate(-90)
 	pixels=img.load()
 	black_white(img,pixels)
-	img=rotate(img,pixels)
-	pixels=img.load()
-	res=reco(img,pixels)
-	print(res,len(res))
-	end_time=time.time()
-	print('%.2f'%(end_time-start_time))
+	#img=rotate(img,pixels)
+	#print(rotate(img,pixels))
+	test(img,pixels)
+	#pixels=img.load()
+	#res=reco(img,pixels)
+	#print(res,len(res))
+	#end_time=time.time()
+	#print('%.2f'%(end_time-start_time))
 
