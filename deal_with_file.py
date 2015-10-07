@@ -29,8 +29,8 @@ def to_image(code,path):
 	length=len(code)
 	c=0
 	flag=1
-	for line in range(2*width,img.size[1]-2*width,width):
-		for row in range(2*width,img.size[0]-2*width,width):
+	for line in range(3*width,img.size[1]-3*width,width):
+		for row in range(3*width,img.size[0]-3*width,width):
 			if c<length:
 				for i in range(width):
 					for j in range(width):
@@ -56,8 +56,13 @@ def add_frame(pixels,length):
 				pixels[p+i,length-1-j]=1
 				pixels[i,p+j]=1
 				pixels[length-1-i,p+j]=1
-#				if not (p/width)%2:
-#					pixels[p+i,j+width]=1
+	for p in range(0,length-width*2,width*2):
+		for i in range(width):
+			for j in range(width):
+				pixels[2*width+i,p+j]=1
+				pixels[p+i,2*width+j]=1
+				pixels[length-3*width+i,p+j]=1
+				pixels[p+i,length-3*width+j]=1
 def to_images(code,path):
 	count=1
 	for item in range(0,len(code),(img_length//width)*(img_length//width)):
@@ -68,8 +73,8 @@ def from_image(path):
 	img=Image.open(path)
 	pixels=img.load()
 	result=''
-	for line in range(2*width,img.size[1]-2*width,width):
-		for row in range(2*width,img.size[0]-2*width,width):
+	for line in range(3*width,img.size[1]-2*width,width):
+		for row in range(3*width,img.size[0]-2*width,width):
 			if pixels[row,line]==0:
 				result+='0'
 			else:
@@ -90,5 +95,5 @@ if __name__=='__main__':
 	#to_images(com(path),'result/images')
 	#uncom(from_image('result/text.bmp'),'result/text')
 	#uncom(from_images('result/images'),'result/text')
-	#res=from_image('result/images/00003.bmp')
+	#res=from_image('result/images/00001.bmp')
 	#print(res,len(res))

@@ -16,7 +16,7 @@ def black_white(img,pixels):
 				pixels[row,line]=(255,255,255)
 	end_time=time.time()
 	print('black_white uses %.2f seconds.'%(end_time-start_time))
-	#img.save('tt1.jpg')
+	img.save('tt1.jpg')
 def rotate(img,pixels):
 	start_time=time.time()
 	line=img.size[1]//2
@@ -354,7 +354,15 @@ def reco_1(pixels):
 
 global p
 p={}
-def test():
+rowst=[]
+linesl=[]
+rowsb=[]
+linesr=[]
+def test(img,pixels):
+	global rowst
+	global linesl
+	global rowsb
+	global linesr
 	global p
 	org=rotate(img,pixels)
 	p['x0']=org['lt']['row']
@@ -366,7 +374,25 @@ def test():
 	p['x1']=org['rt']['row']
 	p['y1']=org['rt']['line']
 	print(p)
+	for i in range(p['y0']+2,p['y3']):
+		if pixels[p['x0']+20+(p['x3']-p['x0'])/(p['y3']-p['y0'])*(i-p['y0']),i][0]!=pixels[p['x0']+20+(p['x3']-p['x0'])/(p['y3']-p['y0'])*(i-1-p['y0']),i-1][0]:
+			linesl.append(i)
+	print(linesl)
 
+	for j in range(p['x0']+1,p['x1']):
+		if pixels[j,p['y0']+20+(p['y1']-p['y0'])/(p['x1']-p['x0'])*(j-p['x0'])][0]!=pixels[j-1,p['y0']+20+(p['y1']-p['y0'])/(p['x1']-p['x0'])*(j-1-p['x0'])][0]:
+			rowst.append(j)
+	print(len(rowst))
+
+	for i in range(p['y1']+2,p['y2']):
+		if pixels[p['x1']-20+(p['x2']-p['x1'])/(p['y2']-p['y1'])*(i-p['y1']),i][0]!=pixels[p['x1']-20+(p['x2']-p['x1'])/(p['y2']-p['y1'])*(i-1-p['y1']),i-1][0]:
+			linesr.append(i)
+	print(len(linesr))
+
+	for j in range(p['x3']+2,p['x2']):
+		if pixels[j,p['y3']-18+(p['y2']-p['y3'])/(p['x2']-p['x3'])*(j-p['x3'])][0]!=pixels[j-1,p['y3']-18+(p['y2']-p['y3'])/(p['x2']-p['x3'])*(j-1-p['x3'])][0]:
+			rowsb.append(j)
+	print(len(rowsb))
 def rec(row,line):
 	a0=p['x0']+(p['x1']-p['x0'])*row/52
 	b0=p['y0']+(p['y1']-p['y0'])*row/52
@@ -376,11 +402,23 @@ def rec(row,line):
 	y=b0+(b1-b0)*line/52
 	return (x,y)
 
+def reco_2():
+	result=''
+	for i in range(1,49):
+		for j in range(1,49):
+			x=rowst[j]+(rowsb[j]-rowst[j])/49*i
+			y=linesl[i]+(linesr[i]-linesl[i])/49*j
+			if pixels[x+8,y+8][0]:
+				result+='1'
+			else:
+				result+='0'
+	return result
+
 
 if __name__=='__main__':
 	start_time=time.time()
 	#img=Image.open('test/007.png')
-	img=Image.open('h.jpg')
+	img=Image.open('m.jpg')
 	#img=img.rotate(-90)
 	pixels=img.load()
 	black_white(img,pixels)
@@ -394,15 +432,25 @@ if __name__=='__main__':
 	#res=reco(img,pixels)
 	#print(res,len(res))
 
-	test()
+	test(img,pixels)
 	print(rec(0,0),rec(52,0),rec(0,52),rec(52,52))
-	for i in range(53):
-		for j in range(53):
-			#pass
-			t=rec(i,j)
-			pixels[t[0],t[1]]=(255,0,0)
-
-	img.save('tt2.jpg')
+#	for i in range(53):
+#		for j in range(53):
+#			#pass
+#			t=rec(i,j)
+#			pixels[t[0],t[1]]=(255,0,0)
+#	for i in range(50):
+#		for j in range(50):
+#			x0=rowst[j]
+#			x1=rowsb[j]
+#			y0=linesl[i]
+#			y1=linesr[i]
+#			x=x0+(x1-x0)/49*i
+#			y=y0+(y1-y0)/49*j
+#			#print(x,y)
+#			pixels[x,y]=(0,255,0)
+#	img.save('tt2.jpg')
+	print(reco_2())
 	end_time=time.time()
 	print('%.2f'%(end_time-start_time))
 
