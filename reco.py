@@ -1,5 +1,4 @@
 from PIL import Image
-import math
 import time
 COUNT_WHITE=3
 COUNT_LENGTH=100
@@ -364,6 +363,8 @@ def test(img,pixels):
 	global rowsb
 	global linesr
 	global p
+	global block_length_row
+	global block_length_line
 	org=rotate(img,pixels)
 	p['x0']=org['lt']['row']
 	p['y0']=org['lt']['line']
@@ -373,26 +374,35 @@ def test(img,pixels):
 	p['y2']=org['rb']['line']
 	p['x1']=org['rt']['row']
 	p['y1']=org['rt']['line']
-	print(p)
-	for i in range(p['y0']+2,p['y3']):
-		if pixels[p['x0']+20+(p['x3']-p['x0'])/(p['y3']-p['y0'])*(i-p['y0']),i][0]!=pixels[p['x0']+20+(p['x3']-p['x0'])/(p['y3']-p['y0'])*(i-1-p['y0']),i-1][0]:
+	block_length_row=(p['x1']-p['x0'])/(NUM_BLOCK+4)
+	block_length_line=(p['y3']-p['y0'])/(NUM_BLOCK+4)
+	off_row=block_length_row*1.5
+	off_line=block_length_line*1.5
+	print('block length row:%.2f, block lenth line:%.2f'%(block_length_row,block_length_line))
+	print('borders:(x0,y0):(%i,%i)\t(x1,y1):(%i,%i)\t(x2,y2):(%i,%i)\t(x3,y3):(%i,%i)'%(p['x0'],p['y0'],p['x1'],p['y1'],p['x2'],p['y2'],p['x3'],p['y3']))
+	for i in range(p['y0']+round(block_length_line/2),p['y3']):
+		if pixels[p['x0']+off_row+(p['x3']-p['x0'])/(p['y3']-p['y0'])*(i-p['y0']),i][0]!=pixels[p['x0']+off_row+(p['x3']-p['x0'])/(p['y3']-p['y0'])*(i-1-p['y0']),i-1][0]:
 			linesl.append(i)
-	print(linesl)
+	if len(linesl)!=NUM_BLOCK+2:
+		print('count left line blocks wrong:%i'%len(linesl))
 
-	for j in range(p['x0']+1,p['x1']):
-		if pixels[j,p['y0']+20+(p['y1']-p['y0'])/(p['x1']-p['x0'])*(j-p['x0'])][0]!=pixels[j-1,p['y0']+20+(p['y1']-p['y0'])/(p['x1']-p['x0'])*(j-1-p['x0'])][0]:
+	for j in range(p['x0']+round(block_length_row/2),p['x1']):
+		if pixels[j,p['y0']+off_line+(p['y1']-p['y0'])/(p['x1']-p['x0'])*(j-p['x0'])][0]!=pixels[j-1,p['y0']+off_line+(p['y1']-p['y0'])/(p['x1']-p['x0'])*(j-1-p['x0'])][0]:
 			rowst.append(j)
-	print(len(rowst))
+	if len(rowst)!=NUM_BLOCK+2:
+		print('count top row blocks wrong:%i'%len(rowst))
 
-	for i in range(p['y1']+2,p['y2']):
-		if pixels[p['x1']-20+(p['x2']-p['x1'])/(p['y2']-p['y1'])*(i-p['y1']),i][0]!=pixels[p['x1']-20+(p['x2']-p['x1'])/(p['y2']-p['y1'])*(i-1-p['y1']),i-1][0]:
+	for i in range(p['y1']+round(block_length_line/2),p['y2']):
+		if pixels[p['x1']-off_row+(p['x2']-p['x1'])/(p['y2']-p['y1'])*(i-p['y1']),i][0]!=pixels[p['x1']-off_row+(p['x2']-p['x1'])/(p['y2']-p['y1'])*(i-1-p['y1']),i-1][0]:
 			linesr.append(i)
-	print(len(linesr))
+	if len(linesr)!=NUM_BLOCK+2:
+		print('count right line blocks wrong:%i'%len(linesr))
 
-	for j in range(p['x3']+2,p['x2']):
-		if pixels[j,p['y3']-18+(p['y2']-p['y3'])/(p['x2']-p['x3'])*(j-p['x3'])][0]!=pixels[j-1,p['y3']-18+(p['y2']-p['y3'])/(p['x2']-p['x3'])*(j-1-p['x3'])][0]:
+	for j in range(p['x3']+round(block_length_row/2),p['x2']):
+		if pixels[j,p['y3']-off_line+(p['y2']-p['y3'])/(p['x2']-p['x3'])*(j-p['x3'])][0]!=pixels[j-1,p['y3']-off_line+(p['y2']-p['y3'])/(p['x2']-p['x3'])*(j-1-p['x3'])][0]:
 			rowsb.append(j)
-	print(len(rowsb))
+	if len(rowsb)!=NUM_BLOCK+2:
+		print('count bottom row blocks wrong:%i'%len(rowsb))
 def rec(row,line):
 	a0=p['x0']+(p['x1']-p['x0'])*row/52
 	b0=p['y0']+(p['y1']-p['y0'])*row/52
@@ -402,23 +412,25 @@ def rec(row,line):
 	y=b0+(b1-b0)*line/52
 	return (x,y)
 
-def reco_2():
+def reco_2(img,pixels):
 	result=''
-	for i in range(1,49):
-		for j in range(1,49):
+	for i in range(1,len(linesl)-1):
+		for j in range(1,len(rowst)-1):
 			x=rowst[j]+(rowsb[j]-rowst[j])/49*i
 			y=linesl[i]+(linesr[i]-linesl[i])/49*j
 			if pixels[x+8,y+8][0]:
 				result+='1'
 			else:
 				result+='0'
+			pixels[x,y]=(0,255,255)
+	img.save('tt2.jpg')
 	return result
 
 
 if __name__=='__main__':
 	start_time=time.time()
 	#img=Image.open('test/007.png')
-	img=Image.open('m.jpg')
+	img=Image.open('n.jpg')
 	#img=img.rotate(-90)
 	pixels=img.load()
 	black_white(img,pixels)
@@ -433,7 +445,7 @@ if __name__=='__main__':
 	#print(res,len(res))
 
 	test(img,pixels)
-	print(rec(0,0),rec(52,0),rec(0,52),rec(52,52))
+	#print(rec(0,0),rec(52,0),rec(0,52),rec(52,52))
 #	for i in range(53):
 #		for j in range(53):
 #			#pass
@@ -450,7 +462,7 @@ if __name__=='__main__':
 #			#print(x,y)
 #			pixels[x,y]=(0,255,0)
 #	img.save('tt2.jpg')
-	print(reco_2())
+	print(reco_2(img,pixels))
 	end_time=time.time()
-	print('%.2f'%(end_time-start_time))
+	print('used %.2f seconds totally.'%(end_time-start_time))
 

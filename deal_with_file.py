@@ -24,7 +24,7 @@ def uncom(code,path):
 	with open(path,'wb') as f:
 		f.write(b)
 def to_image(code,path):
-	img=Image.new('1',(img_length+4*width,img_length+4*width))
+	img=Image.new('1',(img_length+6*width,img_length+6*width))
 	pixels=img.load()
 	length=len(code)
 	c=0
